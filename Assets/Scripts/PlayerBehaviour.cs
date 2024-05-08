@@ -24,14 +24,6 @@ public class PlayerBehaviour : MonoBehaviour
     public float minSwipeDistanceInch = 0.25f; // Inch
     private float minSwipeDistancePixels;
 
-    private int fingerId = int.MinValue;
-    private Vector2 touchStartPos;
-
-    private float swipeStartTime = 0;
-    private float swipeTime = 0.25f;
-    private float swipeTimer = 0f;
-
-
     public float swipeMove = 2f;
 
     private Vector3 dir;
@@ -51,10 +43,11 @@ public class PlayerBehaviour : MonoBehaviour
     private void FixedUpdate()
     {
         var pos = rb.position;
-        pos += dir * swipeMove;
+        pos.x += dir.x * swipeMove;
         rb.MovePosition(pos);
 
         dir = Vector3.zero;
+
 
         rb.AddForce(0, 0, rollSpeed);
     }
@@ -73,11 +66,17 @@ public class PlayerBehaviour : MonoBehaviour
             Debug.Log("LongTap");
         }
 
+        if( MultiTouchMgr.Instance.Swipe != Vector3.zero)
+        {
+            dir = MultiTouchMgr.Instance.Swipe;
+        }
+
+
 #if !UNITY_EDITOR
         Debug.Log(Input.mousePosition);
 #endif
 
-        var horizontalSpeed = 0f;
+        //var horizontalSpeed = 0f;
 
 #if UNITY_ANDROID
         if (Input.touchCount > 0 )
@@ -86,65 +85,63 @@ public class PlayerBehaviour : MonoBehaviour
         }
 #endif
 
-        var h = 0f;
-        if (Input.touchCount > 0)
-        {
-            var pos = Camera.main.ScreenToViewportPoint(Input.touches[0].position);
-            h = pos.x;
-        }
+        //var h = 0f;
+        //if (Input.touchCount > 0)
+        //{
+        //    var pos = Camera.main.ScreenToViewportPoint(Input.touches[0].position);
+        //    h = pos.x;
+        //}
 
-        horizontalSpeed = ( h < 0.5f ? -1 : 1) * dodgeSpeed;
+        //horizontalSpeed = ( h < 0.5f ? -1 : 1) * dodgeSpeed;
         //if (Input.GetMouseButton(0))
         //{
         //   horizontalSpeed = (Input.mousePosition.x < Screen.width * 0.5f)  ? -1f : 1f;
         //}
 
-        for (int i = 0; i < Input.touchCount; ++i)
-        {
-            switch (Input.touches[i].phase)
-            {
-                case TouchPhase.Began:
-                    if (fingerId == int.MinValue)
-                    {
-                        fingerId = Input.touches[i].fingerId;
-                        touchStartPos = Input.touches[i].position;
-                        swipeStartTime = Time.time;
-                        Debug.Log(1);
-                    }
-                    break;
-                case TouchPhase.Moved:
-                case TouchPhase.Stationary:
-                    if (fingerId == Input.touches[i].fingerId)
-                    {
+        //for (int i = 0; i < Input.touchCount; ++i)
+        //{
+        //    switch (Input.touches[i].phase)
+        //    {
+        //        case TouchPhase.Began:
+        //            if (fingerId == int.MinValue)
+        //            {
+        //                fingerId = Input.touches[i].fingerId;
+        //                touchStartPos = Input.touches[i].position;
+        //                swipeStartTime = Time.time;
+        //                Debug.Log(1);
+        //            }
+        //            break;
+        //        case TouchPhase.Moved:
+        //        case TouchPhase.Stationary:
+        //            if (fingerId == Input.touches[i].fingerId)
+        //            {
 
-                    }
-                    break;
-                case TouchPhase.Ended:
-                case TouchPhase.Canceled:
-                    if (fingerId == Input.touches[i].fingerId)
-                    {
-                        var delta = Input.touches[i].position - touchStartPos;
-                        var distance = delta.magnitude;
+        //            }
+        //            break;
+        //        case TouchPhase.Ended:
+        //        case TouchPhase.Canceled:
+        //            if (fingerId == Input.touches[i].fingerId)
+        //            {
+        //                var delta = Input.touches[i].position - touchStartPos;
+        //                var distance = delta.magnitude;
 
-                        if (distance > minSwipeDistancePixels && Time.time - swipeStartTime < swipeTime)
-                        {
-                            dir = delta.x > 0 ? Vector3.right : Vector3.left;
-                        }
-                        else
-                        {
-                            //Debug.Log("Swipe X");
-                        }
-                        fingerId = int.MinValue;
-                        Debug.Log(2);
-                    }
-                    break;
+        //                if (distance > minSwipeDistancePixels && Time.time - swipeStartTime < swipeTime)
+        //                {
+        //                    dir = delta.x > 0 ? Vector3.right : Vector3.left;
+        //                }
+        //                else
+        //                {
+        //                    //Debug.Log("Swipe X");
+        //                }
+        //                fingerId = int.MinValue;
+        //                Debug.Log(2);
+        //            }
+        //            break;
 
-            }
+        //    }
 
-        }
+        //}
 
-
-        //Logger.Log(horizontalSpeed.ToString());
-        rb.AddForce(horizontalSpeed, 0, rollSpeed);
+        //rb.AddForce(horizontalSpeed, 0, rollSpeed);
     }
 }

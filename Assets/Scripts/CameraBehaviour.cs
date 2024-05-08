@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 
 /// <summary> 
 /// Will adjust the camera to follow and face a target 
@@ -9,6 +10,7 @@ public class CameraBehaviour : MonoBehaviour
     public Transform target;
 
     [Tooltip("How offset will the camera be to the target")]
+    public Vector3 defaultOffset = new Vector3(0, 3, -6);
     public Vector3 offset = new Vector3(0, 3, -6);
 
     /// <summary> 
@@ -25,5 +27,13 @@ public class CameraBehaviour : MonoBehaviour
             // Change the rotation to face target 
             transform.LookAt(target);
         }
+        if (MultiTouchMgr.Instance.Zoom != 0f)
+        {
+            offset = defaultOffset + defaultOffset * MultiTouchMgr.Instance.Zoom / 100;
+
+        }
+
+        //Debug.Log(MultiTouchMgr.Instance.Zoom.ToString());
     }
+        
 }
